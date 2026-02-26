@@ -6,7 +6,7 @@
 
 body{
     height: 100vh;
-    background-color: #dae;
+    background-color: rgb(33, 185, 41);
     background-image: url(1.jpg);
     background-size: cover;
     background-position: center;
@@ -20,7 +20,7 @@ a{
     transition: .5s;
 }
 a:hover{
-    color: orange;
+    color: red;
 }
 /* hedar */
 header{

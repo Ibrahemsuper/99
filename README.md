@@ -1,141 +1,106 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>Full Screen Threads</title>
+<title>Interactive Academy Background</title>
 <style>
-    body {
-        margin: 0;
-        overflow: hidden;
-        background: #0f0f1a;
-    }
-    canvas {
-        display: block;
-    }
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: radial-gradient(circle at center, #0a0742, #02000f);
+}
+canvas {
+  display: block;
+}
 </style>
 </head>
 <body>
 
-<canvas id="bg"></canvas>
+<canvas id="bgCanvas"></canvas>
 
 <script>
-const canvas = document.getElementById("bg");
+const canvas = document.getElementById("bgCanvas");
 const ctx = canvas.getContext("2d");
-
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let particles = [];
+let dots = [];
 let mouse = { x: null, y: null };
 
-window.addEventListener("mousemove", (e) => {
-    mouse.x = e.x;
-    mouse.y = e.y;
-});
+window.onmousemove = function(e) {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+};
 
-window.addEventListener("resize", () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    init(); // 🔥 عدلت هون لحتى يرجع يعبّي الشاشة عند التكبير
-});
+class Dot {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.size = 2 + Math.random()*2;
+    this.baseX = x;
+    this.baseY = y;
+  }
+  draw() {
+    ctx.fillStyle = "rgba(0,255,255,0.7)";
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+    ctx.fill();
+  }
+  update() {
+    let dx = mouse.x - this.x;
+    let dy = mouse.y - this.y;
+    let dist = Math.sqrt(dx*dx + dy*dy);
+    let effect = (dist < 150) ? (150 - dist)/150 : 0;
+    this.x -= dx * 0.015 * effect;
+    this.y -= dy * 0.015 * effect;
 
-class Particle {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-        this.size = 2;
-        this.baseX = this.x;
-        this.baseY = this.y;
-        this.density = Math.random() * 30 + 1;
-    }
-
-    draw() {
-        ctx.fillStyle = "#00ffff";
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-    }
-
-    update() {
-        let dx = mouse.x - this.x;
-        let dy = mouse.y - this.y;
-        let distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < 120) { // 🔥 عدلت المسافة هون (كانت 100)
-            this.x -= dx / 15;
-            this.y -= dy / 15;
-        } else {
-            this.x += (this.baseX - this.x) * 0.05;
-            this.y += (this.baseY - this.y) * 0.05;
-        }
-    }
+    this.x += (this.baseX - this.x)*0.08;
+    this.y += (this.baseY - this.y)*0.08;
+  }
 }
 
 function init() {
-    particles = [];
-    for (let y = 0; y < canvas.height; y += 15) { // 🔥 كانت 25 خليتها 15
-        for (let x = 0; x < canvas.width; x += 15) { // 🔥 كانت 25 خليتها 15
-            particles.push(new Particle(x, y));
-        }
+  dots = [];
+  for(let y=0; y<canvas.height; y+=20) {
+    for(let x=0; x<canvas.width; x+=20) {
+      dots.push(new Dot(x, y));
     }
+  }
 }
 
-function connect() {
-    for (let a = 0; a < particles.length; a++) {
-        for (let b = a; b < particles.length; b++) {
-            let dx = particles[a].x - particles[b].x;
-            let dy = particles[a].y - particles[b].y;
-            let distance = dx * dx + dy * dy;
-
-            if (distance < 400) { // 🔥 كانت 900 وعدلتها لتناسب الكثافة
-                ctx.strokeStyle = "rgba(0,255,255,0.15)";
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.moveTo(particles[a].x, particles[a].y);
-                ctx.lineTo(particles[b].x, particles[b].y);
-                ctx.stroke();
-            }
-        }
+function connectDots() {
+  for (let i = 0; i < dots.length; i++) {
+    for (let j = i; j < dots.length; j++) {
+      let dx = dots[i].x - dots[j].x;
+      let dy = dots[i].y - dots[j].y;
+      let dist = dx*dx + dy*dy;
+      if (dist < 400) {
+        ctx.strokeStyle = "rgba(0,255,255,0.15)";
+        ctx.beginPath();
+        ctx.moveTo(dots[i].x, dots[i].y);
+        ctx.lineTo(dots[j].x, dots[j].y);
+        ctx.stroke();
+      }
     }
+  }
 }
 
 function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    particles.forEach(p => {
-        p.update();
-        p.draw();
-    });
-
-    connect();
-    requestAnimationFrame(animate);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  dots.forEach(dot => {
+    dot.update();
+    dot.draw();
+  });
+  connectDots();
+  requestAnimationFrame(animate);
 }
 
 init();
 animate();
+window.onresize = init;
 </script>
 
 </body>
 </html>
-
-
-
-
-
-update() {
-    let dx = mouse.x - this.x;
-    let dy = mouse.y - this.y;
-    let distance = Math.sqrt(dx * dx + dy * dy);
-
-    let maxDistance = 120;
-
-    if (distance < maxDistance) {
-        let force = (maxDistance - distance) / maxDistance;
-        this.x -= dx * force * 0.02;   // 🔥 كانت قوية كتير
-        this.y -= dy * force * 0.02;   // خففناها
-    } else {
-        // رجعة ناعمة جداً
-        this.x += (this.baseX - this.x) * 0.03;
-        this.y += (this.baseY - this.y) * 0.03;
-    }
-}

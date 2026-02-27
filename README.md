@@ -117,3 +117,25 @@ animate();
 
 </body>
 </html>
+
+
+
+
+
+update() {
+    let dx = mouse.x - this.x;
+    let dy = mouse.y - this.y;
+    let distance = Math.sqrt(dx * dx + dy * dy);
+
+    let maxDistance = 120;
+
+    if (distance < maxDistance) {
+        let force = (maxDistance - distance) / maxDistance;
+        this.x -= dx * force * 0.02;   // 🔥 كانت قوية كتير
+        this.y -= dy * force * 0.02;   // خففناها
+    } else {
+        // رجعة ناعمة جداً
+        this.x += (this.baseX - this.x) * 0.03;
+        this.y += (this.baseY - this.y) * 0.03;
+    }
+}

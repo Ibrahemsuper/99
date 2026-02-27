@@ -1,3 +1,58 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>Academy Background</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .content {
+      position: relative;
+      z-index: 2;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 300;
+      letter-spacing: 2px;
+    }
+  </style>
+</head>
+
+<body>
+
+<canvas id="background"></canvas>
+
+<div class="content">
+  <h1>Welcome To Our Academy</h1>
+</div>
+
 <script>
 const canvas = document.getElementById("background");
 const ctx = canvas.getContext("2d");
@@ -34,8 +89,6 @@ class Particle {
     this.y = Math.random() * canvas.height;
     this.vx = (Math.random() - 0.5) * 0.8;
     this.vy = (Math.random() - 0.5) * 0.8;
-    this.baseX = this.x;
-    this.baseY = this.y;
   }
 
   move() {
@@ -45,7 +98,6 @@ class Particle {
     if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
     if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
 
-    // تفاعل الماوس
     if (mouse.x && mouse.y) {
       let dx = this.x - mouse.x;
       let dy = this.y - mouse.y;
@@ -111,3 +163,6 @@ function animate() {
 init();
 animate();
 </script>
+
+</body>
+</html>

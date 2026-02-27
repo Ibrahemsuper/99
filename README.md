@@ -6,11 +6,20 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 let particles = [];
-let mouse = { x: null, y: null };
+let mouse = {
+  x: null,
+  y: null,
+  radius: 150
+};
 
 window.addEventListener("mousemove", (e) => {
   mouse.x = e.x;
   mouse.y = e.y;
+});
+
+window.addEventListener("mouseleave", () => {
+  mouse.x = null;
+  mouse.y = null;
 });
 
 window.addEventListener("resize", () => {
@@ -25,6 +34,8 @@ class Particle {
     this.y = Math.random() * canvas.height;
     this.vx = (Math.random() - 0.5) * 0.8;
     this.vy = (Math.random() - 0.5) * 0.8;
+    this.baseX = this.x;
+    this.baseY = this.y;
   }
 
   move() {
@@ -33,12 +44,28 @@ class Particle {
 
     if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
     if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+
+    // تفاعل الماوس
+    if (mouse.x && mouse.y) {
+      let dx = this.x - mouse.x;
+      let dy = this.y - mouse.y;
+      let distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance < mouse.radius) {
+        let force = (mouse.radius - distance) / mouse.radius;
+        let directionX = dx / distance;
+        let directionY = dy / distance;
+
+        this.x += directionX * force * 3;
+        this.y += directionY * force * 3;
+      }
+    }
   }
 
   draw() {
     ctx.beginPath();
     ctx.arc(this.x, this.y, 1.2, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(255,255,255,0.6)";
+    ctx.fillStyle = "rgba(255,255,255,0.7)";
     ctx.fill();
   }
 }

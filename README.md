@@ -1,105 +1,147 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-<meta charset="UTF-8">
-<title>Interactive Academy Background</title>
-<style>
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow: hidden;
-  background: radial-gradient(circle at center, #0a0742, #02000f);
-}
-canvas {
-  display: block;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>Academy Background</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .content {
+      position: relative;
+      z-index: 2;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 300;
+      letter-spacing: 2px;
+    }
+  </style>
 </head>
+
 <body>
 
-<canvas id="bgCanvas"></canvas>
+<canvas id="background"></canvas>
+
+<div class="content">
+  <h1>Welcome To Our Academy</h1>
+</div>
 
 <script>
-const canvas = document.getElementById("bgCanvas");
-const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+  const canvas = document.getElementById("background");
+  const ctx = canvas.getContext("2d");
 
-let dots = [];
-let mouse = { x: null, y: null };
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 
-window.onmousemove = function(e) {
-  mouse.x = e.clientX;
-  mouse.y = e.clientY;
-};
+  let particles = [];
+  let mouse = {
+    x: null,
+    y: null,
+    radius: 120
+  };
 
-class Dot {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.size = 2 + Math.random()*2;
-    this.baseX = x;
-    this.baseY = y;
-  }
-  draw() {
-    ctx.fillStyle = "rgba(0,255,255,0.7)";
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
-    ctx.fill();
-  }
-  update() {
-    let dx = mouse.x - this.x;
-    let dy = mouse.y - this.y;
-    let dist = Math.sqrt(dx*dx + dy*dy);
-    let effect = (dist < 150) ? (150 - dist)/150 : 0;
-    this.x -= dx * 0.015 * effect;
-    this.y -= dy * 0.015 * effect;
-
-    this.x += (this.baseX - this.x)*0.08;
-    this.y += (this.baseY - this.y)*0.08;
-  }
-}
-
-function init() {
-  dots = [];
-  for(let y=0; y<canvas.height; y+=20) {
-    for(let x=0; x<canvas.width; x+=20) {
-      dots.push(new Dot(x, y));
-    }
-  }
-}
-
-function connectDots() {
-  for (let i = 0; i < dots.length; i++) {
-    for (let j = i; j < dots.length; j++) {
-      let dx = dots[i].x - dots[j].x;
-      let dy = dots[i].y - dots[j].y;
-      let dist = dx*dx + dy*dy;
-      if (dist < 400) {
-        ctx.strokeStyle = "rgba(0,255,255,0.15)";
-        ctx.beginPath();
-        ctx.moveTo(dots[i].x, dots[i].y);
-        ctx.lineTo(dots[j].x, dots[j].y);
-        ctx.stroke();
-      }
-    }
-  }
-}
-
-function animate() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  dots.forEach(dot => {
-    dot.update();
-    dot.draw();
+  window.addEventListener("mousemove", function(event) {
+    mouse.x = event.x;
+    mouse.y = event.y;
   });
-  connectDots();
-  requestAnimationFrame(animate);
-}
 
-init();
-animate();
-window.onresize = init;
+  window.addEventListener("resize", function() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    init();
+  });
+
+  class Particle {
+    constructor(x, y, directionX, directionY) {
+      this.x = x;
+      this.y = y;
+      this.directionX = directionX;
+      this.directionY = directionY;
+    }
+
+    draw() {
+      ctx.beginPath();
+      ctx.strokeStyle = "rgba(255,255,255,0.15)";
+      ctx.lineWidth = 0.5;
+      ctx.moveTo(this.x, this.y);
+      ctx.lineTo(this.x + this.directionX * 8, this.y + this.directionY * 8);
+      ctx.stroke();
+    }
+
+    update() {
+      if (this.x > canvas.width || this.x < 0) {
+        this.directionX = -this.directionX;
+      }
+      if (this.y > canvas.height || this.y < 0) {
+        this.directionY = -this.directionY;
+      }
+
+      let dx = mouse.x - this.x;
+      let dy = mouse.y - this.y;
+      let distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance < mouse.radius) {
+        this.x -= dx * 0.02;
+        this.y -= dy * 0.02;
+      }
+
+      this.x += this.directionX;
+      this.y += this.directionY;
+
+      this.draw();
+    }
+  }
+
+  function init() {
+    particles = [];
+    let numberOfParticles = 150;
+
+    for (let i = 0; i < numberOfParticles; i++) {
+      let x = Math.random() * canvas.width;
+      let y = Math.random() * canvas.height;
+      let directionX = (Math.random() - 0.5) * 0.5;
+      let directionY = (Math.random() - 0.5) * 0.5;
+
+      particles.push(new Particle(x, y, directionX, directionY));
+    }
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    particles.forEach(particle => particle.update());
+  }
+
+  init();
+  animate();
 </script>
 
 </body>

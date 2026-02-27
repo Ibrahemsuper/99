@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Interactive Threads Background</title>
+<title>Full Screen Threads</title>
 <style>
     body {
         margin: 0;
@@ -37,6 +36,7 @@ window.addEventListener("mousemove", (e) => {
 window.addEventListener("resize", () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    init(); // 🔥 عدلت هون لحتى يرجع يعبّي الشاشة عند التكبير
 });
 
 class Particle {
@@ -60,32 +60,21 @@ class Particle {
         let dx = mouse.x - this.x;
         let dy = mouse.y - this.y;
         let distance = Math.sqrt(dx * dx + dy * dy);
-        let forceDirectionX = dx / distance;
-        let forceDirectionY = dy / distance;
 
-        let maxDistance = 100;
-        let force = (maxDistance - distance) / maxDistance;
-
-        if (distance < maxDistance) {
-            this.x -= forceDirectionX * force * this.density;
-            this.y -= forceDirectionY * force * this.density;
+        if (distance < 120) { // 🔥 عدلت المسافة هون (كانت 100)
+            this.x -= dx / 15;
+            this.y -= dy / 15;
         } else {
-            if (this.x !== this.baseX) {
-                let dx = this.x - this.baseX;
-                this.x -= dx / 10;
-            }
-            if (this.y !== this.baseY) {
-                let dy = this.y - this.baseY;
-                this.y -= dy / 10;
-            }
+            this.x += (this.baseX - this.x) * 0.05;
+            this.y += (this.baseY - this.y) * 0.05;
         }
     }
 }
 
 function init() {
     particles = [];
-    for (let y = 0; y < canvas.height; y += 25) {
-        for (let x = 0; x < canvas.width; x += 25) {
+    for (let y = 0; y < canvas.height; y += 15) { // 🔥 كانت 25 خليتها 15
+        for (let x = 0; x < canvas.width; x += 15) { // 🔥 كانت 25 خليتها 15
             particles.push(new Particle(x, y));
         }
     }
@@ -98,8 +87,8 @@ function connect() {
             let dy = particles[a].y - particles[b].y;
             let distance = dx * dx + dy * dy;
 
-            if (distance < 900) {
-                ctx.strokeStyle = "rgba(0,255,255,0.2)";
+            if (distance < 400) { // 🔥 كانت 900 وعدلتها لتناسب الكثافة
+                ctx.strokeStyle = "rgba(0,255,255,0.15)";
                 ctx.lineWidth = 1;
                 ctx.beginPath();
                 ctx.moveTo(particles[a].x, particles[a].y);

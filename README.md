@@ -1,23 +1,37 @@
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quran Learning App</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <header>
-    <h1>Quran Learning App</h1>
-    <button id="toggle-theme">تغيير الوضع</button>
-    <input type="text" id="search-input" placeholder="ابحث عن كلمة...">
-  </header>
+body {
+  font-family: "Arial", sans-serif;
+  background-color: #fdf6e3;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
 
-  <main>
-    <div id="surah-list"></div>
-    <div id="search-results"></div>
-  </main>
+header {
+  padding: 1rem;
+  background-color: #008080;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-  <script src="script.js"></script>
-</body>
-</html>
+input {
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+.ayah-card {
+  border-bottom: 1px solid #ccc;
+  padding: 0.5rem;
+}
+
+button {
+  margin: 0.2rem;
+  padding: 0.3rem 0.5rem;
+  cursor: pointer;
+}
+
+.dark-mode {
+  background-color: #121212;
+  color: #f5f5f5;
+}
